@@ -26,7 +26,7 @@ def convert_openapi3_to_swagger2(spec: dict) -> dict:
         "info": spec.get("info", {}),
         "host": "localhost:8000",
         "basePath": "/",
-        "schemes": ["https"],
+        "schemes": ["http"],
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "paths": {},
