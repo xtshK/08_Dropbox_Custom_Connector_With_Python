@@ -1,0 +1,919 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Dropbox Business Connector",
+    "description": "Custom Connector for Power Automate — Dropbox Business with Team Folder support",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8000",
+  "basePath": "/",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/auth/test": {
+      "get": {
+        "operationId": "TestConnection",
+        "summary": "Test Connection",
+        "description": "Verify that the Dropbox connection is working and Team Folder access is available.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/files/upload": {
+      "post": {
+        "operationId": "UploadFile",
+        "summary": "Upload File",
+        "description": "Upload a file to Dropbox (including Team Folders). Max 150MB per request.",
+        "tags": [
+          "Files"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "$ref": "#/definitions/FileMetadata"
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        },
+        "consumes": [
+          "multipart/form-data"
+        ]
+      }
+    },
+    "/files/download": {
+      "post": {
+        "operationId": "DownloadFile",
+        "summary": "Download File",
+        "description": "Download a file from Dropbox (including Team Folders).",
+        "tags": [
+          "Files"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {}
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/folders/create": {
+      "post": {
+        "operationId": "CreateFolder",
+        "summary": "Create Folder",
+        "description": "Create a new folder in Dropbox (including Team Folders).",
+        "tags": [
+          "Folders"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateFolderRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "$ref": "#/definitions/FolderMetadata"
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/folders/delete": {
+      "post": {
+        "operationId": "DeleteFolder",
+        "summary": "Delete Folder",
+        "description": "Delete a folder from Dropbox (including Team Folders).",
+        "tags": [
+          "Folders"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DeleteFolderRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {}
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/folders/list": {
+      "post": {
+        "operationId": "ListFolder",
+        "summary": "List Folder Contents",
+        "description": "List contents of a folder in Dropbox (including Team Folders). Use empty string for root.",
+        "tags": [
+          "Folders"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ListFolderRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "$ref": "#/definitions/ListFolderResponse"
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/sharing/create-link": {
+      "post": {
+        "operationId": "CreateSharedLink",
+        "summary": "Create Shared Link",
+        "description": "Create a shared link for a file or folder (including Team Folders).",
+        "tags": [
+          "Sharing"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateSharedLinkRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "$ref": "#/definitions/SharedLinkMetadata"
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/sharing/list-links": {
+      "post": {
+        "operationId": "ListSharedLinks",
+        "summary": "List Shared Links",
+        "description": "List shared links for a file or folder (including Team Folders).",
+        "tags": [
+          "Sharing"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ListSharedLinksRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SharedLinkMetadata"
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/sharing/revoke-link": {
+      "post": {
+        "operationId": "RevokeSharedLink",
+        "summary": "Revoke Shared Link",
+        "description": "Revoke a shared link.",
+        "tags": [
+          "Sharing"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RevokeSharedLinkRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {}
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/search/files": {
+      "post": {
+        "operationId": "SearchFiles",
+        "summary": "Search Files",
+        "description": "Search for files and folders across personal and Team Folders.",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SearchRequest"
+            },
+            "x-ms-summary": "Body"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "$ref": "#/definitions/SearchResponse"
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        }
+      }
+    },
+    "/triggers/file-changes": {
+      "get": {
+        "operationId": "OnFileChanged",
+        "summary": "Monitor File Changes (Trigger)",
+        "description": "Polling trigger that monitors a Dropbox folder (including Team Folders) for file changes.",
+        "tags": [
+          "Triggers"
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Folder path to monitor, e.g. /Team Folder",
+            "x-ms-summary": "Path"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Cursor from previous poll (internal)",
+            "x-ms-visibility": "internal",
+            "x-ms-summary": "Cursor"
+          },
+          {
+            "name": "recursive",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "Monitor subfolders",
+            "default": true,
+            "x-ms-summary": "Recursive"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Changes detected",
+            "schema": {}
+          },
+          "202": {
+            "description": "No changes, retry later"
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        },
+        "x-ms-trigger": "poll",
+        "x-ms-trigger-hint": "Monitors a Dropbox folder for file changes"
+      }
+    },
+    "/": {
+      "get": {
+        "operationId": "root__get",
+        "summary": "Root",
+        "description": "",
+        "tags": [
+          "Root"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Body_DownloadFile": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Dropbox file path to download"
+        }
+      },
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "title": "Body_DownloadFile"
+    },
+    "Body_UploadFile": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Dropbox destination path, e.g. /Team Folder/file.txt"
+        },
+        "mode": {
+          "type": "string",
+          "title": "Mode",
+          "description": "Write mode: add, overwrite",
+          "default": "add"
+        },
+        "autorename": {
+          "type": "boolean",
+          "title": "Autorename",
+          "description": "Auto-rename if exists",
+          "default": false
+        },
+        "file": {
+          "type": "string",
+          "format": "binary",
+          "title": "File",
+          "description": "File to upload"
+        }
+      },
+      "type": "object",
+      "required": [
+        "path",
+        "file"
+      ],
+      "title": "Body_UploadFile"
+    },
+    "CreateFolderRequest": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Folder path to create, e.g. /Team Folder/new-folder",
+          "x-ms-summary": "Folder Path"
+        }
+      },
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "title": "CreateFolderRequest"
+    },
+    "CreateSharedLinkRequest": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "File or folder path",
+          "x-ms-summary": "Path"
+        },
+        "requested_visibility": {
+          "type": "string",
+          "title": "Requested Visibility",
+          "description": "public, team_only, or password",
+          "default": "public",
+          "x-ms-summary": "Visibility"
+        },
+        "password": {
+          "type": "string",
+          "title": "Password",
+          "description": "Password for the link (if visibility=password)",
+          "x-ms-summary": "Password"
+        },
+        "expires": {
+          "type": "string",
+          "title": "Expires",
+          "description": "Expiry date in ISO format",
+          "x-ms-summary": "Expires"
+        }
+      },
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "title": "CreateSharedLinkRequest"
+    },
+    "DeleteFolderRequest": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Folder path to delete",
+          "x-ms-summary": "Folder Path"
+        }
+      },
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "title": "DeleteFolderRequest"
+    },
+    "EntryMetadata": {
+      "properties": {
+        ".tag": {
+          "type": "string",
+          "title": ".Tag",
+          "description": "file or folder",
+          "x-ms-summary": "Type"
+        },
+        "id": {
+          "type": "string",
+          "title": "Id",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "x-ms-summary": "Name"
+        },
+        "path_display": {
+          "type": "string",
+          "title": "Path Display",
+          "x-ms-summary": "Display Path"
+        },
+        "size": {
+          "type": "integer",
+          "title": "Size",
+          "x-ms-summary": "Size (bytes)"
+        },
+        "server_modified": {
+          "type": "string",
+          "title": "Server Modified",
+          "x-ms-summary": "Last Modified"
+        }
+      },
+      "type": "object",
+      "required": [
+        ".tag",
+        "id",
+        "name",
+        "path_display"
+      ],
+      "title": "EntryMetadata"
+    },
+    "FileMetadata": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id",
+          "x-ms-summary": "File ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "x-ms-summary": "File Name"
+        },
+        "path_display": {
+          "type": "string",
+          "title": "Path Display",
+          "x-ms-summary": "Display Path"
+        },
+        "size": {
+          "type": "integer",
+          "title": "Size",
+          "x-ms-summary": "Size (bytes)"
+        },
+        "rev": {
+          "type": "string",
+          "title": "Rev",
+          "x-ms-summary": "Revision"
+        },
+        "server_modified": {
+          "type": "string",
+          "title": "Server Modified",
+          "x-ms-summary": "Last Modified"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path_display",
+        "size",
+        "rev",
+        "server_modified"
+      ],
+      "title": "FileMetadata"
+    },
+    "FolderMetadata": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id",
+          "x-ms-summary": "Folder ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "x-ms-summary": "Folder Name"
+        },
+        "path_display": {
+          "type": "string",
+          "title": "Path Display",
+          "x-ms-summary": "Display Path"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path_display"
+      ],
+      "title": "FolderMetadata"
+    },
+    "HTTPValidationError": {
+      "properties": {
+        "detail": {
+          "items": {
+            "$ref": "#/definitions/ValidationError"
+          },
+          "type": "array",
+          "title": "Detail"
+        }
+      },
+      "type": "object",
+      "title": "HTTPValidationError"
+    },
+    "ListFolderRequest": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Folder path to list (empty string for root)",
+          "default": "",
+          "x-ms-summary": "Folder Path"
+        },
+        "recursive": {
+          "type": "boolean",
+          "title": "Recursive",
+          "description": "List recursively",
+          "default": false,
+          "x-ms-summary": "Recursive"
+        },
+        "limit": {
+          "type": "integer",
+          "maximum": 2000.0,
+          "minimum": 1.0,
+          "title": "Limit",
+          "description": "Max entries to return",
+          "default": 100,
+          "x-ms-summary": "Limit"
+        }
+      },
+      "type": "object",
+      "title": "ListFolderRequest"
+    },
+    "ListFolderResponse": {
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/definitions/EntryMetadata"
+          },
+          "type": "array",
+          "title": "Entries"
+        },
+        "has_more": {
+          "type": "boolean",
+          "title": "Has More",
+          "x-ms-summary": "Has More"
+        },
+        "cursor": {
+          "type": "string",
+          "title": "Cursor",
+          "x-ms-summary": "Cursor"
+        }
+      },
+      "type": "object",
+      "required": [
+        "entries",
+        "has_more",
+        "cursor"
+      ],
+      "title": "ListFolderResponse"
+    },
+    "ListSharedLinksRequest": {
+      "properties": {
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "File or folder path",
+          "x-ms-summary": "Path"
+        }
+      },
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "title": "ListSharedLinksRequest"
+    },
+    "RevokeSharedLinkRequest": {
+      "properties": {
+        "url": {
+          "type": "string",
+          "title": "Url",
+          "description": "Shared link URL to revoke",
+          "x-ms-summary": "Shared Link URL"
+        }
+      },
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "title": "RevokeSharedLinkRequest"
+    },
+    "SearchMatchMetadata": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id",
+          "x-ms-summary": "ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "x-ms-summary": "Name"
+        },
+        "path_display": {
+          "type": "string",
+          "title": "Path Display",
+          "x-ms-summary": "Display Path"
+        },
+        "tag": {
+          "type": "string",
+          "title": "Tag",
+          "description": "file or folder",
+          "x-ms-summary": "Type"
+        },
+        "size": {
+          "type": "integer",
+          "title": "Size",
+          "x-ms-summary": "Size (bytes)"
+        },
+        "server_modified": {
+          "type": "string",
+          "title": "Server Modified",
+          "x-ms-summary": "Last Modified"
+        }
+      },
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "path_display",
+        "tag"
+      ],
+      "title": "SearchMatchMetadata"
+    },
+    "SearchRequest": {
+      "properties": {
+        "query": {
+          "type": "string",
+          "title": "Query",
+          "description": "Search query string",
+          "x-ms-summary": "Query"
+        },
+        "path": {
+          "type": "string",
+          "title": "Path",
+          "description": "Restrict search to this folder path",
+          "default": "",
+          "x-ms-summary": "Folder Path"
+        },
+        "max_results": {
+          "type": "integer",
+          "maximum": 100.0,
+          "minimum": 1.0,
+          "title": "Max Results",
+          "description": "Max results to return",
+          "default": 20,
+          "x-ms-summary": "Max Results"
+        },
+        "file_extensions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "File Extensions",
+          "description": "Filter by file extensions, e.g. ['pdf','docx']",
+          "x-ms-summary": "File Extensions"
+        }
+      },
+      "type": "object",
+      "required": [
+        "query"
+      ],
+      "title": "SearchRequest"
+    },
+    "SearchResponse": {
+      "properties": {
+        "matches": {
+          "items": {
+            "$ref": "#/definitions/SearchMatchMetadata"
+          },
+          "type": "array",
+          "title": "Matches"
+        },
+        "has_more": {
+          "type": "boolean",
+          "title": "Has More",
+          "x-ms-summary": "Has More"
+        }
+      },
+      "type": "object",
+      "required": [
+        "matches",
+        "has_more"
+      ],
+      "title": "SearchResponse"
+    },
+    "SharedLinkMetadata": {
+      "properties": {
+        "url": {
+          "type": "string",
+          "title": "Url",
+          "x-ms-summary": "URL"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "x-ms-summary": "Name"
+        },
+        "path_lower": {
+          "type": "string",
+          "title": "Path Lower",
+          "x-ms-summary": "Path"
+        },
+        "visibility": {
+          "type": "string",
+          "title": "Visibility",
+          "x-ms-summary": "Visibility"
+        },
+        "expires": {
+          "type": "string",
+          "title": "Expires",
+          "x-ms-summary": "Expires"
+        }
+      },
+      "type": "object",
+      "required": [
+        "url",
+        "name",
+        "path_lower",
+        "visibility"
+      ],
+      "title": "SharedLinkMetadata"
+    },
+    "ValidationError": {
+      "properties": {
+        "loc": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Location"
+        },
+        "msg": {
+          "type": "string",
+          "title": "Message"
+        },
+        "type": {
+          "type": "string",
+          "title": "Error Type"
+        },
+        "input": {
+          "title": "Input"
+        },
+        "ctx": {
+          "type": "object",
+          "title": "Context"
+        }
+      },
+      "type": "object",
+      "required": [
+        "loc",
+        "msg",
+        "type"
+      ],
+      "title": "ValidationError"
+    }
+  },
+  "securityDefinitions": {
+    "apiKey": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "apiKey": []
+    }
+  ]
+}
