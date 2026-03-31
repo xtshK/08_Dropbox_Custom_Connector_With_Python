@@ -86,6 +86,45 @@
         }
       }
     },
+    "/folders/options": {
+      "get": {
+        "operationId": "GetFolderOptions",
+        "summary": "List Folder Options",
+        "description": "Returns folder list for dynamic dropdown in Power Automate.",
+        "tags": [
+          "Folders"
+        ],
+        "parameters": [
+          {
+            "name": "parent_path",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Parent folder path (empty = root)",
+            "default": "",
+            "x-ms-summary": "Parent Path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FolderOption"
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "schema": {
+              "$ref": "#/definitions/HTTPValidationError"
+            }
+          }
+        },
+        "x-ms-visibility": "internal"
+      }
+    },
     "/folders/create": {
       "post": {
         "operationId": "CreateFolder",
@@ -345,7 +384,12 @@
             "required": true,
             "type": "string",
             "description": "Folder path to monitor, e.g. /Team Folder",
-            "x-ms-summary": "Path"
+            "x-ms-summary": "Path",
+            "x-ms-dynamic-values": {
+              "operationId": "GetFolderOptions",
+              "value-path": "value",
+              "value-title": "display_name"
+            }
           },
           {
             "name": "cursor",
@@ -381,7 +425,7 @@
             }
           }
         },
-        "x-ms-trigger": "poll",
+        "x-ms-trigger": "batch",
         "x-ms-trigger-hint": "Monitors a Dropbox folder for file changes"
       }
     },
@@ -457,7 +501,12 @@
           "type": "string",
           "title": "Path",
           "description": "Folder path to create, e.g. /Team Folder/new-folder",
-          "x-ms-summary": "Folder Path"
+          "x-ms-summary": "Folder Path",
+          "x-ms-dynamic-values": {
+            "operationId": "GetFolderOptions",
+            "value-path": "value",
+            "value-title": "display_name"
+          }
         }
       },
       "type": "object",
@@ -472,7 +521,12 @@
           "type": "string",
           "title": "Path",
           "description": "File or folder path",
-          "x-ms-summary": "Path"
+          "x-ms-summary": "Path",
+          "x-ms-dynamic-values": {
+            "operationId": "GetFolderOptions",
+            "value-path": "value",
+            "value-title": "display_name"
+          }
         },
         "requested_visibility": {
           "type": "string",
@@ -506,7 +560,12 @@
           "type": "string",
           "title": "Path",
           "description": "Folder path to delete",
-          "x-ms-summary": "Folder Path"
+          "x-ms-summary": "Folder Path",
+          "x-ms-dynamic-values": {
+            "operationId": "GetFolderOptions",
+            "value-path": "value",
+            "value-title": "display_name"
+          }
         }
       },
       "type": "object",
@@ -628,6 +687,26 @@
       ],
       "title": "FolderMetadata"
     },
+    "FolderOption": {
+      "properties": {
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "description": "Folder path"
+        },
+        "display_name": {
+          "type": "string",
+          "title": "Display Name",
+          "description": "Display name"
+        }
+      },
+      "type": "object",
+      "required": [
+        "value",
+        "display_name"
+      ],
+      "title": "FolderOption"
+    },
     "HTTPValidationError": {
       "properties": {
         "detail": {
@@ -648,7 +727,12 @@
           "title": "Path",
           "description": "Folder path to list (empty string for root)",
           "default": "",
-          "x-ms-summary": "Folder Path"
+          "x-ms-summary": "Folder Path",
+          "x-ms-dynamic-values": {
+            "operationId": "GetFolderOptions",
+            "value-path": "value",
+            "value-title": "display_name"
+          }
         },
         "recursive": {
           "type": "boolean",
@@ -704,7 +788,12 @@
           "type": "string",
           "title": "Path",
           "description": "File or folder path",
-          "x-ms-summary": "Path"
+          "x-ms-summary": "Path",
+          "x-ms-dynamic-values": {
+            "operationId": "GetFolderOptions",
+            "value-path": "value",
+            "value-title": "display_name"
+          }
         }
       },
       "type": "object",
@@ -784,7 +873,12 @@
           "title": "Path",
           "description": "Restrict search to this folder path",
           "default": "",
-          "x-ms-summary": "Folder Path"
+          "x-ms-summary": "Folder Path",
+          "x-ms-dynamic-values": {
+            "operationId": "GetFolderOptions",
+            "value-path": "value",
+            "value-title": "display_name"
+          }
         },
         "max_results": {
           "type": "integer",

@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends
+from typing import List
+from fastapi import APIRouter, Depends, Query
 import dropbox
 from dropbox.files import FolderMetadata as DbxFolderMeta, FileMetadata as DbxFileMeta
 
+from pydantic import BaseModel, Field
 from app.dependencies import get_dbx
 from app.models.folders import (
     CreateFolderRequest,
@@ -13,6 +15,42 @@ from app.models.folders import (
 )
 
 router = APIRouter(prefix="/folders", tags=["Folders"])
+
+
+class FolderOption(BaseModel):
+    value: str = Field(..., description="Folder path")
+    display_name: str = Field(..., description="Display name")
+
+
+@router.get(
+    "/options",
+    response_model=List[FolderOption],
+    summary="List Folder Options",
+    description="Returns folder list for dynamic dropdown in Power Automate.",
+    operation_id="GetFolderOptions",
+)
+def get_folder_options(
+    parent_path: str = Query("", description="Parent folder path (empty = root)"),
+    dbx: dropbox.Dropbox = Depends(get_dbx),
+):
+    result = dbx.files_list_folder(parent_path, recursive=False)
+    folders = []
+    for entry in result.entries:
+        if isinstance(entry, DbxFolderMeta):
+            folders.append(FolderOption(
+                value=entry.path_display,
+                display_name=entry.path_display,
+            ))
+    # Fetch all if has_more
+    while result.has_more:
+        result = dbx.files_list_folder_continue(result.cursor)
+        for entry in result.entries:
+            if isinstance(entry, DbxFolderMeta):
+                folders.append(FolderOption(
+                    value=entry.path_display,
+                    display_name=entry.path_display,
+                ))
+    return folders
 
 
 @router.post(

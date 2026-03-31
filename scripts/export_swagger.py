@@ -166,13 +166,24 @@ def _convert_schema(schema: dict) -> dict:
 
 def inject_power_automate_extensions(swagger: dict) -> dict:
     """Add Power Automate-specific x-ms-* extensions."""
+
+    # Operations that should NOT get dynamic dropdown on their path param
+    SKIP_DYNAMIC = {"GetFolderOptions"}
+    # path param names that should get a dynamic folder dropdown
+    DYNAMIC_PATH_NAMES = {"path", "parent_path"}
+
     for path, methods in swagger.get("paths", {}).items():
         for method, operation in methods.items():
+            op_id = operation.get("operationId", "")
+
+            # Hide GetFolderOptions from Power Automate UI (internal helper)
+            if op_id == "GetFolderOptions":
+                operation["x-ms-visibility"] = "internal"
+
             # Add x-ms-trigger for polling trigger
-            if operation.get("operationId") == "OnFileChanged":
-                operation["x-ms-trigger"] = "poll"
+            if op_id == "OnFileChanged":
+                operation["x-ms-trigger"] = "batch"
                 operation["x-ms-trigger-hint"] = "Monitors a Dropbox folder for file changes"
-                # Hide cursor parameter
                 for param in operation.get("parameters", []):
                     if param.get("name") == "cursor":
                         param["x-ms-visibility"] = "internal"
@@ -181,6 +192,32 @@ def inject_power_automate_extensions(swagger: dict) -> dict:
             for param in operation.get("parameters", []):
                 if "x-ms-summary" not in param:
                     param["x-ms-summary"] = param.get("name", "").replace("_", " ").title()
+
+            # Add x-ms-dynamic-values to "path" params (query params and body properties)
+            if op_id not in SKIP_DYNAMIC:
+                # For query/formData params named "path"
+                for param in operation.get("parameters", []):
+                    if param.get("name") in DYNAMIC_PATH_NAMES and param.get("in") in ("query", "formData"):
+                        param["x-ms-dynamic-values"] = {
+                            "operationId": "GetFolderOptions",
+                            "value-path": "value",
+                            "value-title": "display_name",
+                        }
+
+                    # For body params, inject into schema properties
+                    if param.get("in") == "body":
+                        schema = param.get("schema", {})
+                        ref = schema.get("$ref", "")
+                        if ref:
+                            def_name = ref.split("/")[-1]
+                            definition = swagger.get("definitions", {}).get(def_name, {})
+                            props = definition.get("properties", {})
+                            if "path" in props:
+                                props["path"]["x-ms-dynamic-values"] = {
+                                    "operationId": "GetFolderOptions",
+                                    "value-path": "value",
+                                    "value-title": "display_name",
+                                }
 
     return swagger
 
