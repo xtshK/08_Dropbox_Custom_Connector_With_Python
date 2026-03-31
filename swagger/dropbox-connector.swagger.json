@@ -5,7 +5,7 @@
     "description": "Custom Connector for Power Automate — Dropbox Business with Team Folder support",
     "version": "1.0.0"
   },
-  "host": "trade-entitled-kingdom-attach.trycloudflare.com",
+  "host": "localhost:8000",
   "basePath": "/",
   "schemes": [
     "https"
