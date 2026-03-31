@@ -32,13 +32,23 @@ def convert_openapi3_to_swagger2(spec: dict) -> dict:
         "paths": {},
         "definitions": {},
         "securityDefinitions": {
-            "apiKey": {
-                "type": "apiKey",
-                "name": "X-API-Key",
-                "in": "header",
+            "oauth2": {
+                "type": "oauth2",
+                "flow": "accessCode",
+                "authorizationUrl": "https://www.dropbox.com/oauth2/authorize",
+                "tokenUrl": "https://api.dropboxapi.com/oauth2/token",
+                "scopes": {
+                    "files.content.read": "Read file content",
+                    "files.content.write": "Write file content",
+                    "files.metadata.read": "Read file metadata",
+                    "files.metadata.write": "Write file metadata",
+                    "sharing.read": "Read sharing info",
+                    "sharing.write": "Manage sharing",
+                    "account_info.read": "Read account info"
+                }
             }
         },
-        "security": [{"apiKey": []}],
+        "security": [{"oauth2": []}],
     }
 
     # Convert paths
@@ -187,6 +197,12 @@ def inject_power_automate_extensions(swagger: dict) -> dict:
                 for param in operation.get("parameters", []):
                     if param.get("name") == "cursor":
                         param["x-ms-visibility"] = "internal"
+
+            # Remove 'authorization' header param (OAuth 2.0 handles it automatically)
+            operation["parameters"] = [
+                p for p in operation.get("parameters", [])
+                if not (p.get("name") == "authorization" and p.get("in") == "header")
+            ]
 
             # Add x-ms-summary to parameters
             for param in operation.get("parameters", []):
