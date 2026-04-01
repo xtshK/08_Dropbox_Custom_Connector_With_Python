@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import dropbox
 
-from app.routers import auth, files, folders, sharing, search, triggers
+from app.routers import auth, files, folders, search, triggers
 
 app = FastAPI(
     title="Dropbox Business Connector",
@@ -14,7 +14,6 @@ app = FastAPI(
 app.include_router(auth.router)
 app.include_router(files.router)
 app.include_router(folders.router)
-app.include_router(sharing.router)
 app.include_router(search.router)
 app.include_router(triggers.router)
 
