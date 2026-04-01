@@ -40,34 +40,6 @@
         }
       }
     },
-    "/files/upload": {
-      "post": {
-        "operationId": "UploadFile",
-        "summary": "Upload File",
-        "description": "Upload a file to Dropbox (including Team Folders). Max 150MB per request.",
-        "tags": [
-          "Files"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "schema": {
-              "$ref": "#/definitions/FileMetadata"
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "schema": {
-              "$ref": "#/definitions/HTTPValidationError"
-            }
-          }
-        },
-        "consumes": [
-          "multipart/form-data"
-        ]
-      }
-    },
     "/files/download": {
       "post": {
         "operationId": "DownloadFile",
@@ -233,112 +205,6 @@
         }
       }
     },
-    "/sharing/create-link": {
-      "post": {
-        "operationId": "CreateSharedLink",
-        "summary": "Create Shared Link",
-        "description": "Create a shared link for a file or folder (including Team Folders).",
-        "tags": [
-          "Sharing"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/CreateSharedLinkRequest"
-            },
-            "x-ms-summary": "Body"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "schema": {
-              "$ref": "#/definitions/SharedLinkMetadata"
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "schema": {
-              "$ref": "#/definitions/HTTPValidationError"
-            }
-          }
-        }
-      }
-    },
-    "/sharing/list-links": {
-      "post": {
-        "operationId": "ListSharedLinks",
-        "summary": "List Shared Links",
-        "description": "List shared links for a file or folder (including Team Folders).",
-        "tags": [
-          "Sharing"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/ListSharedLinksRequest"
-            },
-            "x-ms-summary": "Body"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/SharedLinkMetadata"
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "schema": {
-              "$ref": "#/definitions/HTTPValidationError"
-            }
-          }
-        }
-      }
-    },
-    "/sharing/revoke-link": {
-      "post": {
-        "operationId": "RevokeSharedLink",
-        "summary": "Revoke Shared Link",
-        "description": "Revoke a shared link.",
-        "tags": [
-          "Sharing"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/RevokeSharedLinkRequest"
-            },
-            "x-ms-summary": "Body"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "schema": {}
-          },
-          "422": {
-            "description": "Validation Error",
-            "schema": {
-              "$ref": "#/definitions/HTTPValidationError"
-            }
-          }
-        }
-      }
-    },
     "/search/files": {
       "post": {
         "operationId": "SearchFiles",
@@ -467,39 +333,6 @@
       ],
       "title": "Body_DownloadFile"
     },
-    "Body_UploadFile": {
-      "properties": {
-        "path": {
-          "type": "string",
-          "title": "Path",
-          "description": "Dropbox destination path, e.g. /Team Folder/file.txt"
-        },
-        "mode": {
-          "type": "string",
-          "title": "Mode",
-          "description": "Write mode: add, overwrite",
-          "default": "add"
-        },
-        "autorename": {
-          "type": "boolean",
-          "title": "Autorename",
-          "description": "Auto-rename if exists",
-          "default": false
-        },
-        "file": {
-          "type": "string",
-          "format": "binary",
-          "title": "File",
-          "description": "File to upload"
-        }
-      },
-      "type": "object",
-      "required": [
-        "path",
-        "file"
-      ],
-      "title": "Body_UploadFile"
-    },
     "CreateFolderRequest": {
       "properties": {
         "path": {
@@ -519,45 +352,6 @@
         "path"
       ],
       "title": "CreateFolderRequest"
-    },
-    "CreateSharedLinkRequest": {
-      "properties": {
-        "path": {
-          "type": "string",
-          "title": "Path",
-          "description": "File or folder path",
-          "x-ms-summary": "Path",
-          "x-ms-dynamic-values": {
-            "operationId": "GetFolderOptions",
-            "value-path": "value",
-            "value-title": "display_name"
-          }
-        },
-        "requested_visibility": {
-          "type": "string",
-          "title": "Requested Visibility",
-          "description": "public, team_only, or password",
-          "default": "public",
-          "x-ms-summary": "Visibility"
-        },
-        "password": {
-          "type": "string",
-          "title": "Password",
-          "description": "Password for the link (if visibility=password)",
-          "x-ms-summary": "Password"
-        },
-        "expires": {
-          "type": "string",
-          "title": "Expires",
-          "description": "Expiry date in ISO format",
-          "x-ms-summary": "Expires"
-        }
-      },
-      "type": "object",
-      "required": [
-        "path"
-      ],
-      "title": "CreateSharedLinkRequest"
     },
     "DeleteFolderRequest": {
       "properties": {
@@ -621,50 +415,6 @@
         "path_display"
       ],
       "title": "EntryMetadata"
-    },
-    "FileMetadata": {
-      "properties": {
-        "id": {
-          "type": "string",
-          "title": "Id",
-          "x-ms-summary": "File ID"
-        },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "x-ms-summary": "File Name"
-        },
-        "path_display": {
-          "type": "string",
-          "title": "Path Display",
-          "x-ms-summary": "Display Path"
-        },
-        "size": {
-          "type": "integer",
-          "title": "Size",
-          "x-ms-summary": "Size (bytes)"
-        },
-        "rev": {
-          "type": "string",
-          "title": "Rev",
-          "x-ms-summary": "Revision"
-        },
-        "server_modified": {
-          "type": "string",
-          "title": "Server Modified",
-          "x-ms-summary": "Last Modified"
-        }
-      },
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-        "path_display",
-        "size",
-        "rev",
-        "server_modified"
-      ],
-      "title": "FileMetadata"
     },
     "FolderMetadata": {
       "properties": {
@@ -787,41 +537,6 @@
       ],
       "title": "ListFolderResponse"
     },
-    "ListSharedLinksRequest": {
-      "properties": {
-        "path": {
-          "type": "string",
-          "title": "Path",
-          "description": "File or folder path",
-          "x-ms-summary": "Path",
-          "x-ms-dynamic-values": {
-            "operationId": "GetFolderOptions",
-            "value-path": "value",
-            "value-title": "display_name"
-          }
-        }
-      },
-      "type": "object",
-      "required": [
-        "path"
-      ],
-      "title": "ListSharedLinksRequest"
-    },
-    "RevokeSharedLinkRequest": {
-      "properties": {
-        "url": {
-          "type": "string",
-          "title": "Url",
-          "description": "Shared link URL to revoke",
-          "x-ms-summary": "Shared Link URL"
-        }
-      },
-      "type": "object",
-      "required": [
-        "url"
-      ],
-      "title": "RevokeSharedLinkRequest"
-    },
     "SearchMatchMetadata": {
       "properties": {
         "id": {
@@ -932,43 +647,6 @@
       ],
       "title": "SearchResponse"
     },
-    "SharedLinkMetadata": {
-      "properties": {
-        "url": {
-          "type": "string",
-          "title": "Url",
-          "x-ms-summary": "URL"
-        },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "x-ms-summary": "Name"
-        },
-        "path_lower": {
-          "type": "string",
-          "title": "Path Lower",
-          "x-ms-summary": "Path"
-        },
-        "visibility": {
-          "type": "string",
-          "title": "Visibility",
-          "x-ms-summary": "Visibility"
-        },
-        "expires": {
-          "type": "string",
-          "title": "Expires",
-          "x-ms-summary": "Expires"
-        }
-      },
-      "type": "object",
-      "required": [
-        "url",
-        "name",
-        "path_lower",
-        "visibility"
-      ],
-      "title": "SharedLinkMetadata"
-    },
     "ValidationError": {
       "properties": {
         "loc": {
@@ -1011,11 +689,7 @@
       "tokenUrl": "https://api.dropboxapi.com/oauth2/token",
       "scopes": {
         "files.content.read": "Read file content",
-        "files.content.write": "Write file content",
         "files.metadata.read": "Read file metadata",
-        "files.metadata.write": "Write file metadata",
-        "sharing.read": "Read sharing info",
-        "sharing.write": "Manage sharing",
         "account_info.read": "Read account info"
       }
     }

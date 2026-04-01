@@ -39,11 +39,7 @@ def convert_openapi3_to_swagger2(spec: dict) -> dict:
                 "tokenUrl": "https://api.dropboxapi.com/oauth2/token",
                 "scopes": {
                     "files.content.read": "Read file content",
-                    "files.content.write": "Write file content",
                     "files.metadata.read": "Read file metadata",
-                    "files.metadata.write": "Write file metadata",
-                    "sharing.read": "Read sharing info",
-                    "sharing.write": "Manage sharing",
                     "account_info.read": "Read account info"
                 }
             }
